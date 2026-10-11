@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domarkvitto – Kareby IS</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f5f5f5;
+    color: #111;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+body:before {
+    content: "";
+    display: block;
+    height: 4px;
+    background: #c81111;
+}
+
+.page {
+    width: min(700px, calc(100% - 16px));
+    margin: 18px auto 40px;
+}
+
+header {
+    background: #111;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+header h1 {
+    margin: 0 0 6px;
+    font-size: clamp(26px, 5vw, 38px);
+}
+
+header p {
+    margin: 0;
+    font-size: 16px;
+}
+
+form {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: clamp(15px, 3vw, 30px);
+}
+
+.section {
+    margin-bottom: 25px;
+}
+
+.section-title {
+    background: #c81111;
+    color: #fff;
+    padding: 10px 13px;
+    margin: 0 0 18px;
+    font-size: 21px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+.required {
+    color: #c81111;
+}
+
+input,
+select {
+    width: 100%;
+    min-height: 46px;
+    border: 2px solid #222;
+    border-radius: 0;
+    padding: 8px 10px;
+    font: 17px Georgia, "Times New Roman", serif;
+    background: #fff;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+textarea {
+    width: 100%;
+    min-height: 110px;
+    border: 2px solid #222;
+    border-radius: 0;
+    padding: 10px;
+    font: 17px Georgia, "Times New Roman", serif;
+    background: #fff;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: 3px solid rgba(200, 17, 17, .18);
+    border-color: #c81111;
+}
+
+input:focus,
+select:focus {
+    outline: 3px solid rgba(200, 17, 17, .18);
+    border-color: #c81111;
+}
+
+.hint {
+    margin-top: 4px;
+    color: #666;
+    font-size: 14px;
+}
+
+.conditional {
+    display: none;
+}
+
+.conditional.visible {
+    display: flex;
+}
+
+.information {
+    margin: 22px 0 12px;
+    padding: 16px;
+    background: #f3f3f3;
+    border: 1px solid #ccc;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+.information p {
+    margin: 0 0 12px;
+}
+
+.information p:last-child {
+    margin-bottom: 0;
+}
+
+.consent {
+    background: #f3f3f3;
+    border-left: 5px solid #c81111;
+    padding: 13px 15px;
+    margin-top: 4px;
+    line-height: 1.45;
+    font-size: 15px;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+button {
+    flex: 1;
+    min-height: 52px;
+    border: 0;
+    cursor: pointer;
+    font: 700 18px Georgia, "Times New Roman", serif;
+}
+
+.submit-button {
+    background: #077d0b;
+    color: #fff;
+}
+
+.submit-button:hover {
+    background: #046722;
+}
+
+.reset-button {
+    background: #222;
+    color: #fff;
+}
+
+.reset-button:hover {
+    background: #000;
+}
+
+.message {
+    display: none;
+    margin-top: 18px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.message.success {
+    display: block;
+    background: #e8f5e9;
+    border: 2px solid #2e7d32;
+    color: #1b5e20;
+}
+
+.message.error {
+    display: block;
+    background: #ffebee;
+    border: 2px solid #c62828;
+    color: #b71c1c;
+}
+
+.sending {
+    opacity: .65;
+    pointer-events: none;
+}
+
+footer {
+    text-align: center;
+    color: #666;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+@media (max-width: 700px) {
+
+    .page {
+        margin-top: 10px;
+    }
+
+    header {
+        padding: 17px 12px;
+    }
+
+    header h1 {
+        font-size: 27px;
+    }
+
+    form {
+        padding: 14px;
+    }
+
+    .grid {
+        gap: 16px;
+    }
+
+    .section-title {
+        font-size: 19px;
+    }
+
+    label {
+        font-size: 16px;
+    }
+
+    input,
+    select {
+        min-height: 50px;
+        font-size: 17px;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+}
+
+/* Anpassning av datumfält för mobil */
+input[type="date"] {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+@media (max-width: 400px) {
+    input[type="date"] {
+        font-size: 15px;
+        padding: 8px 5px;
+    }
+}
+
+
+
+
+
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<header>
+    <h1>DOMARKVITTO</h1>
+    <p>Kareby IS</p>
+</header>
+
+
+<form id="domarForm">
+
+<div class="section">
+
+<h2 class="section-title">Matchuppgifter</h2>
+
+<div class="grid">
+
+
+<div class="field">
+    <label for="matchdatum">
+        Matchdatum <span class="required">*</span>
+    </label>
+
+    <input
+        id="matchdatum"
+        name="matchdatum"
+        type="date"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="hemmalag">
+        Hemmalag <span class="required">*</span>
+    </label>
+
+    <input
+        id="hemmalag"
+        name="hemmalag"
+        type="text"
+        placeholder="ex. Kareby IS F15-16"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="bortalag">
+        Bortalag <span class="required">*</span>
+    </label>
+
+    <input
+        id="bortalag"
+        name="bortalag"
+        type="text"
+        placeholder="ex. Ytterby IS"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="spelform">
+        Spelform <span class="required">*</span>
+    </label>
+
+    <input
+        id="spelform"
+        name="spelform"
+        type="text"
+        placeholder="ex. 7-7"
+        required
+    >
+
+    <div class="hint">
+        Se anslagstavla i bollboden.
+    </div>
+</div>
+
+
+<div class="field">
+    <label for="domararvode">
+        Domararvode i kr <span class="required">*</span>
+    </label>
+
+    <input
+        id="domararvode"
+        name="domararvode"
+        type="number"
+        min="0"
+        step="1"
+        inputmode="numeric"
+        placeholder="ex. 250"
+        required
+    >
+
+    <div class="hint">
+        Se anslagstavla i bollboden.
+    </div>
+</div>
+
+
+<div class="field">
+    <label for="lag">
+        Lag i Kareby IS som domaren tillhör
+    </label>
+
+    <input
+        id="lag"
+        name="lag"
+        type="text"
+        placeholder="ex. P12"
+    >
+</div>
+
+
+<div class="field">
+    <label for="ansvarigLedare">
+        Ansvarig ledare <span class="required">*</span>
+    </label>
+
+    <input
+        id="ansvarigLedare"
+        name="ansvarigLedare"
+        type="text"
+        placeholder="För- och efternamn"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="mobil">
+        Mobiltelefonnummer till ledare <span class="required">*</span>
+    </label>
+
+    <input
+        id="mobil"
+        name="mobil"
+        type="tel"
+        placeholder="ex. 0706-66 66 66"
+        autocomplete="tel"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="domarensNamn">
+        Domarens namn <span class="required">*</span>
+    </label>
+
+    <input
+        id="domarensNamn"
+        name="domarensNamn"
+        type="text"
+        placeholder="För- och efternamn"
+        autocomplete="name"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="personnummer">
+        Domarens personnummer <span class="required">*</span>
+    </label>
+
+    <input
+        id="personnummer"
+        name="personnummer"
+        type="text"
+        inputmode="numeric"
+        placeholder="ex. 20100101-2131"
+        autocomplete="off"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="mailadress">
+        Domarens mailadress <span class="required">*</span>
+    </label>
+
+    <input
+        id="mailadress"
+        name="mailadress"
+        type="email"
+        placeholder="ex. namn@example.se"
+        autocomplete="email"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="adress">
+        Domarens adress <span class="required">*</span>
+    </label>
+
+    <input
+        id="adress"
+        name="adress"
+        type="text"
+        placeholder="ex. Karebyvägen 125"
+        autocomplete="street-address"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="postnummer">
+        Domarens postnummer <span class="required">*</span>
+    </label>
+
+    <input
+        id="postnummer"
+        name="postnummer"
+        type="text"
+        inputmode="numeric"
+        placeholder="ex. 442 93"
+        autocomplete="postal-code"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="postort">
+        Domarens postort <span class="required">*</span>
+    </label>
+
+    <input
+        id="postort"
+        name="postort"
+        type="text"
+        placeholder="ex. Kareby"
+        autocomplete="address-level2"
+        required
+    >
+</div>
+
+
+<div class="field">
+    <label for="swish">
+        Telefonnummer att Swisha till <span class="required">*</span>
+    </label>
+
+    <input
+        id="swish"
+        name="swish"
+        type="tel"
+        placeholder="ex. 0707-66 66 66"
+        required
+        inputmode="numeric"
+    >
+</div>
+
+
+<div class="field">
+    <label for="swishRegistrerad">
+        Är telefonnumret registrerat i domarens namn?
+        <span class="required">*</span>
+    </label>
+
+    <select
+        id="swishRegistrerad"
+        name="swishRegistrerad"
+        required
+    >
+        <option value="">Välj...</option>
+        <option value="Ja">Ja</option>
+        <option value="Nej">Nej</option>
+    </select>
+</div>
+
+
+<div
+    class="field conditional"
+    id="telefonAgareField"
+>
+
+    <label for="telefonAgare">
+        Om svaret är Nej – vem står telefonnumret på?
+    </label>
+
+    <input
+        id="telefonAgare"
+        name="telefonAgare"
+        type="text"
+        placeholder="För- och efternamn"
+        inputmode="numeric"
+    >
+
+</div>
+
+
+<div class="field">
+
+    <label for="ovrigt">
+        Övrigt
+    </label>
+
+    <textarea
+        id="ovrigt"
+        name="ovrigt"
+        placeholder="Extra information eller meddelande"
+    ></textarea>
+
+</div>
+
+
+</div>
+</div>
+
+
+<div class="information">
+
+    <p>
+        Ansvarig ledare ansvarar för att detta kvitto är korrekt ifylld
+    </p>
+
+    <p>
+        Ersättningsnivåerna ovan gäller såväl tränings- som tävlingsmatcher
+    </p>
+
+    <p>
+        När domarkvittot skickas in samtycker domaren att uppgifterna i sammanställningen nedan får lagras och behandlas vidare av Kareby IS, org.nr: 853300-1742 för att uppfylla lagstadgade krav.
+    </p>
+
+    <p>
+        Utbetalning sker via Swish senast fem arbetsdagar efter att domarkvittot har skickats in.
+    </p>
+
+</div>
+
+
+<div class="consent">
+
+    Genom att skicka in formuläret bekräftar du att uppgifterna är korrekta och att de får användas för hantering av domarersättning och kvitto.
+
+</div>
+
+
+<div class="buttons">
+
+    <button
+        type="submit"
+        class="submit-button"
+    >
+        SKICKA IN
+    </button>
+
+    <button
+        type="button"
+        class="reset-button"
+        id="resetButton"
+    >
+        Rensa
+    </button>
+
+</div>
+
+
+<div
+    id="message"
+    class="message"
+></div>
+
+
+</form>
+
+
+<footer>
+    Kareby IS – Domarkvitto
+</footer>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   GOOGLE APPS SCRIPT
+   ===================================================== */
+
+const CONFIG = {
+
+    SCRIPT_URL:
+        "https://script.google.com/macros/s/AKfycbxHXZMNlsPel34dXAbovKzvILWSmdINdb3Fe7xbJeljZX_ZBu4pT0cL_06rzKQLa1Dj/exec",
+
+    beställningstyp:
+        "domarkvitto",
+
+    förening:
+        "Kareby IS"
+
+};
+
+
+/* =====================================================
+   ELEMENT
+   ===================================================== */
+
+const form =
+    document.getElementById("domarForm");
+
+const message =
+    document.getElementById("message");
+
+const resetButton =
+    document.getElementById("resetButton");
+
+const swishRegistrerad =
+    document.getElementById("swishRegistrerad");
+
+const telefonAgareField =
+    document.getElementById("telefonAgareField");
+
+const telefonAgare =
+    document.getElementById("telefonAgare");
+
+
+/* =====================================================
+   SWISH – VISA / DÖLJ ÄGARE
+   ===================================================== */
+
+swishRegistrerad.addEventListener(
+    "change",
+    function () {
+
+        const show =
+            this.value === "Nej";
+
+        telefonAgareField.classList.toggle(
+            "visible",
+            show
+        );
+
+        telefonAgare.required =
+            show;
+
+        if (!show) {
+            telefonAgare.value = "";
+        }
+
+    }
+);
+
+
+/* =====================================================
+   RENSKNAPP
+   ===================================================== */
+
+resetButton.addEventListener(
+    "click",
+    function () {
+
+        if (
+            confirm(
+                "Vill du verkligen rensa formuläret?"
+            )
+        ) {
+
+            form.reset();
+
+            telefonAgareField.classList.remove(
+                "visible"
+            );
+
+            telefonAgare.required =
+                false;
+
+            message.className =
+                "message";
+
+            message.textContent =
+                "";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SKICKA FORMULÄR
+   ===================================================== */
+
+form.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+
+        /* Kontrollera formuläret */
+
+        if (!form.checkValidity()) {
+
+            form.reportValidity();
+
+            return;
+        }
+
+
+      
+
+
+        /* Hämta formulärdata */
+
+        const data =
+            Object.fromEntries(
+                new FormData(form).entries()
+            );
+
+
+        const button =
+            form.querySelector(
+                ".submit-button"
+            );
+
+
+        button.textContent =
+            "SKICKAR...";
+
+        form.classList.add(
+            "sending"
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    CONFIG.SCRIPT_URL,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+                        },
+
+                        body:
+                            JSON.stringify(data)
+
+                    }
+                );
+
+
+            let result = null;
+
+
+            try {
+
+                result =
+                    await response.json();
+
+            } catch (e) {
+
+                console.log(
+                    "Kunde inte läsa JSON-svar."
+                );
+
+            }
+
+
+            if (
+                !response.ok ||
+                (
+                    result &&
+                    result.success === false
+                )
+            ) {
+
+                throw new Error(
+                    result &&
+                    result.message
+                        ? result.message
+                        : "Något gick fel."
+                );
+
+            }
+
+
+            /* Lyckades */
+
+            showMessage(
+                "Tack! Uppgifterna är inskickade. En bekräftelse skickas till " +
+                data.mailadress +
+                ".",
+                "success"
+            );
+
+
+            form.reset();
+
+            telefonAgareField.classList.remove(
+                "visible"
+            );
+
+            telefonAgare.required =
+                false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Det gick inte att skicka formuläret. Kontrollera internetanslutningen och försök igen.",
+                "error"
+            );
+
+        } finally {
+
+            button.textContent =
+                "SKICKA IN";
+
+            form.classList.remove(
+                "sending"
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   MEDDELANDE
+   ===================================================== */
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.textContent =
+        text;
+
+    message.className =
+        "message " + type;
+
+}
+
+</script>
+
+</body>
+</html>
