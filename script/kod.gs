@@ -19,12 +19,12 @@
 
 const CONFIG = {
 
-  SHEET_NAME: "Domarkvitton",
+  SHEET_NAME: "Domarrapporter",
 
-  ADMIN_EMAIL: "olle.ostlund@kareby.com",
+  ADMIN_EMAIL: "domare@kareby.com",
 
   // ID till Drive-mappen där PDF-kvitton ska sparas
-  DRIVE_FOLDER_ID: "1s5O3SOivo1_eotcnB0YDMuAGVxWva0Nw",
+  DRIVE_FOLDER_ID: "1gSUBf8lJGjRM_fX3JtZVIEfBvtcWZaQj",
 
   // ID till Kareby IS-loggan
   LOGO_FILE_ID: "1LLbDYRRqucNzX3jJuaLiZFa5vMEBUqiS",
@@ -494,7 +494,8 @@ function doPost(e) {
 
     const receiptNumber =
       getNextReceiptNumber_(
-        sheet
+        sheet,
+        data.matchdatum
       );
 
 
@@ -788,64 +789,74 @@ function validateFormData_(data) {
 }
 
 
+
 /*******************************************************
- * NÄSTA KVITTONUMMER
+ * NÄSTA KVITTONUMMER BASERAT PÅ MATCHDATUM
+ * Format: YYMMDD-01, YYMMDD-02 osv.
  *******************************************************/
 
-function getNextReceiptNumber_(sheet) {
+function getNextReceiptNumber_(sheet, matchdatum) {
 
-  const lastRow =
-    sheet.getLastRow();
-
-
-  if (lastRow < 2) {
-
-    return 1001;
-
+  if (!matchdatum) {
+    throw new Error("Matchdatum saknas.");
   }
 
+  // Matchdatum från formuläret: YYYY-MM-DD
+  const parts = String(matchdatum).split("-");
 
-  const values =
-    sheet
+  if (
+    parts.length !== 3 ||
+    !/^\d{4}$/.test(parts[0]) ||
+    !/^\d{2}$/.test(parts[1]) ||
+    !/^\d{2}$/.test(parts[2])
+  ) {
+    throw new Error("Matchdatum har fel format.");
+  }
+
+  const prefix =
+    parts[0].slice(-2) +
+    parts[1] +
+    parts[2];
+
+  const lastRow = sheet.getLastRow();
+
+  let maxNumber = 0;
+
+  if (lastRow >= 2) {
+
+    const values = sheet
       .getRange(
         2,
         COL.KVITTONUMMER,
         lastRow - 1,
         1
       )
-      .getValues();
+      .getDisplayValues();
 
+    const pattern = new RegExp(
+      "^" + prefix + "-(\\d+)$"
+    );
 
-  let maxNumber =
-    1000;
+    values.forEach(function(row) {
 
+      const value = String(row[0]).trim();
+      const match = value.match(pattern);
 
-  values.forEach(
-    function(row) {
+      if (match) {
+        const number = Number(match[1]);
 
-      const value =
-        Number(
-          row[0]
-        );
-
-
-      if (
-        !isNaN(value) &&
-        value > maxNumber
-      ) {
-
-        maxNumber =
-          value;
-
+        if (number > maxNumber) {
+          maxNumber = number;
+        }
       }
 
-    }
-  );
+    });
+  }
 
-
-  return maxNumber + 1;
-
+  return prefix + "-" +
+    String(maxNumber + 1).padStart(2, "0");
 }
+
 
 
 /*******************************************************
@@ -915,7 +926,7 @@ function sendConfirmationEmail_(
 
     <div style="font-family:Arial,sans-serif">
 
-      <h2>Domarkvitto mottaget</h2>
+      <h2>Domarrapport mottagen</h2>
 
       <p>
         Hej ${escapeHtml_(
@@ -924,14 +935,14 @@ function sendConfirmationEmail_(
       </p>
 
       <p>
-        Ditt domarkvitto har tagits emot av
+        Ditt underlag har tagits emot av
         ${escapeHtml_(
           CONFIG.CLUB_NAME
         )}.
       </p>
 
       <p>
-        <strong>Kvittonummer:</strong>
+        <strong>Referensnummer:</strong>
         ${receiptNumber}
       </p>
 
@@ -964,7 +975,7 @@ function sendConfirmationEmail_(
 
       <p>
         Utbetalning sker via Swish senast fem
-        arbetsdagar efter att domarkvittot har
+        arbetsdagar efter att domarrapporten har
         skickats in.
       </p>
 
@@ -1012,7 +1023,7 @@ function sendAdminNotification_(
 
   const body = `
 
-Nytt domarkvitto har skickats in.
+Ny domarrapport har skickats in.
 
 Kvittonummer: ${receiptNumber}
 

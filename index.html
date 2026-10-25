@@ -463,6 +463,7 @@ input[type="date"] {
 </div>
 
 
+
 <div class="field">
     <label for="personnummer">
         Domarens personnummer <span class="required">*</span>
@@ -475,9 +476,13 @@ input[type="date"] {
         inputmode="numeric"
         placeholder="ex. 20100101-2131"
         autocomplete="off"
+        pattern="[0-9]{8}-?[0-9]{4}"
+        maxlength="13"
+        title="Ange personummer, 12 siffror, ex. 20100101-2131"
         required
     >
 </div>
+
 
 
 <div class="field">
@@ -593,7 +598,7 @@ input[type="date"] {
         name="telefonAgare"
         type="text"
         placeholder="För- och efternamn"
-        inputmode="numeric"
+        
     >
 
 </div>
@@ -621,7 +626,7 @@ input[type="date"] {
 <div class="information">
 
     <p>
-        Ansvarig ledare ansvarar för att detta kvitto är korrekt ifylld
+        Ansvarig ledare ansvarar för att denna rapport är korrekt ifylld
     </p>
 
     <p>
@@ -629,11 +634,11 @@ input[type="date"] {
     </p>
 
     <p>
-        När domarkvittot skickas in samtycker domaren att uppgifterna i sammanställningen nedan får lagras och behandlas vidare av Kareby IS, org.nr: 853300-1742 för att uppfylla lagstadgade krav.
+        När domarrapporten skickas in samtycker domaren att uppgifterna i sammanställningen nedan får lagras och behandlas vidare av Kareby IS, org.nr: 853300-1742 för att uppfylla lagstadgade krav.
     </p>
 
     <p>
-        Utbetalning sker via Swish senast fem arbetsdagar efter att domarkvittot har skickats in.
+        Utbetalning sker via Swish senast fem arbetsdagar efter att domarrapporten har skickats in.
     </p>
 
 </div>
@@ -691,7 +696,7 @@ input[type="date"] {
 const CONFIG = {
 
     SCRIPT_URL:
-        "https://script.google.com/macros/s/AKfycbx00qkYmABCndpbLzrfRcczpBJK4_8fue1JFXePxUmGsXn7dtwxYJHkyPU8FHA2Zf5t0Q/exec",
+       "https://script.google.com/macros/s/AKfycbzPHFuGojE1fot9bMqxXUYhe2AcborjQBL4r5DJ2wi1s5POT4z1oqIQ0k9IdQtXFHtmZw/exec",
 
     beställningstyp:
         "domarkvitto",
@@ -700,6 +705,40 @@ const CONFIG = {
         "Kareby IS"
 
 };
+
+/* =====================================================
+   STOR BOKSTAV I BÖRJAN AV VARJE ORD
+   ===================================================== */
+
+const fältMedStorBokstav = [
+    "hemmalag",
+    "bortalag",
+    "lag",
+    "ansvarigLedare",
+    "domarensNamn",
+    "telefonAgare",
+    "postort"
+];
+
+fältMedStorBokstav.forEach(function(id) {
+    const fält = document.getElementById(id);
+
+    if (!fält) return;
+
+    fält.addEventListener("input", function() {
+        const start = this.selectionStart;
+        const slut = this.selectionEnd;
+
+        this.value = this.value.replace(
+            /(^|\s)(\p{L})/gu,
+            function(match, mellanrum, bokstav) {
+                return mellanrum + bokstav.toLocaleUpperCase("sv-SE");
+            }
+        );
+
+        this.setSelectionRange(start, slut);
+    });
+});
 
 
 /* =====================================================
@@ -817,6 +856,12 @@ form.addEventListener(
             Object.fromEntries(
                 new FormData(form).entries()
             );
+        
+
+        data.personnummer = data.personnummer
+            .replace(/-/g, "")
+            .replace(/^(\d{8})(\d{4})$/, "$1-$2");
+
 
 
         const button =
